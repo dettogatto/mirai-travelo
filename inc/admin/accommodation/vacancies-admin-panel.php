@@ -667,7 +667,7 @@ if ( ! function_exists( 'trav_acc_vacancy_save_action' ) ) {
         foreach ($child_price_data as $key => $value) {
           // filter out empty rows
           $child_price_data[$key] = array_filter($value, function($v){
-            return (!empty($v[0]) && !empty($v[1]) && !empty($v[2]));
+            return ($v[0] != "" && $v[1] != "" && $v[0] <= $v[1]);
           });
           // sort by min age
           usort($child_price_data[$key], function($a, $b) { return $a[0] - $b[0]; });
