@@ -54,7 +54,13 @@
     e.preventDefault();
 
     var child_cost_age = $(this).closest('.child_cost_age');
-    child_cost_age.remove();
+    var single_child_cost = $(this).closest('.single_child_cost');
+
+    if(single_child_cost.find('.child_cost_age').length > 1){
+      child_cost_age.remove();
+    } else {
+      single_child_cost.remove();
+    }
 
     hide_remove_buttons();
 
@@ -104,5 +110,15 @@
   });
 
   $(document).ready(hide_remove_buttons);
+
+
+
+
+  $('.mt-check-all-row').click(function(){
+    $(this).closest('tr').find('input[type="checkbox"]').prop("checked", true);
+  });
+  $('.mt-uncheck-all-row').click(function(){
+    $(this).closest('tr').find('input[type="checkbox"]').prop("checked", false);
+  });
 
 })(jQuery);

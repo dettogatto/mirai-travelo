@@ -1,0 +1,11 @@
+.trav_admin_table input[type="checkbox"]{
+  width: 1rem;
+}
+
+.admin-weekdays-table th{
+  padding-left: 20px;
+}
+
+.admin-weekdays-table{
+  margin: 25px 0px 25px -20px;
+}

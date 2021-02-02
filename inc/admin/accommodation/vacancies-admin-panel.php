@@ -466,6 +466,67 @@ if ( ! function_exists( 'trav_acc_vacancy_render_manage_page' ) ) {
 						<td><input type="text" name="date_to" id="date_to" value="<?php if ( ( ! empty( $vacancy_data['date_to'] ) ) && ( $vacancy_data['date_to'] != '9999-12-31' ) ) echo esc_attr( $vacancy_data['date_to'] ); ?>"></td>
 						<td><span><?php _e('Leave it blank if this rooms are available all the time', 'trav') ?></span></td>
 					</tr>
+          <tr>
+            <th><?php _e('Minimum stay (nights)', 'trav') ?></th>
+            <td><input type="number" name="minimum_stay" value="<?php if ( ! empty( $vacancy_data['minimum_stay'] ) ) echo esc_attr( $vacancy_data['minimum_stay'] ); ?>" step="1"></td>
+            <td><span><?php _e('Leave blank for no restriction', 'trav') ?></span></td>
+          </tr>
+          <tr>
+            <th><?php _e('Maximum stay (nights)', 'trav') ?></th>
+            <td><input type="number" name="maximum_stay" value="<?php if ( ! empty( $vacancy_data['maximum_stay'] ) ) echo esc_attr( $vacancy_data['maximum_stay'] ); ?>" step="1"></td>
+            <td><span><?php _e('Leave blank for no restriction', 'trav') ?></span></td>
+          </tr>
+
+          <tr>
+            <th>Weekdays</th>
+            <td colspan="2">
+              <table class="admin-weekdays-table">
+                <tr>
+                  <td></td>
+                  <th style="padding-left: 20px;">Mon</th>
+                  <th style="padding-left: 20px;">Tue</th>
+                  <th style="padding-left: 20px;">Wed</th>
+                  <th style="padding-left: 20px;">Thu</th>
+                  <th style="padding-left: 20px;">Fri</th>
+                  <th style="padding-left: 20px;">Sat</th>
+                  <th style="padding-left: 20px;">Sun</th>
+                  <td></td>
+                </tr>
+                <tr>
+                  <th class="check-title">Check-in</th>
+                  <td><input type="checkbox" name="checkin_days[0]" value="1" <?php if ( !$vacancy_data['id'] || $vacancy_data['checkin_days'][0] ) echo esc_attr( 'checked' ); ?>></td>
+                  <td><input type="checkbox" name="checkin_days[1]" value="1" <?php if ( !$vacancy_data['id'] || $vacancy_data['checkin_days'][1] ) echo esc_attr( 'checked' ); ?>></td>
+                  <td><input type="checkbox" name="checkin_days[2]" value="1" <?php if ( !$vacancy_data['id'] || $vacancy_data['checkin_days'][2] ) echo esc_attr( 'checked' ); ?>></td>
+                  <td><input type="checkbox" name="checkin_days[3]" value="1" <?php if ( !$vacancy_data['id'] || $vacancy_data['checkin_days'][3] ) echo esc_attr( 'checked' ); ?>></td>
+                  <td><input type="checkbox" name="checkin_days[4]" value="1" <?php if ( !$vacancy_data['id'] || $vacancy_data['checkin_days'][4] ) echo esc_attr( 'checked' ); ?>></td>
+                  <td><input type="checkbox" name="checkin_days[5]" value="1" <?php if ( !$vacancy_data['id'] || $vacancy_data['checkin_days'][5] ) echo esc_attr( 'checked' ); ?>></td>
+                  <td><input type="checkbox" name="checkin_days[6]" value="1" <?php if ( !$vacancy_data['id'] || $vacancy_data['checkin_days'][6] ) echo esc_attr( 'checked' ); ?>></td>
+                  <td>
+                    <a href="#" class="button-primary mt-check-all-row">ALL</a>
+                    <a href="#" class="button-primary mt-uncheck-all-row">NONE</a>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="check-title">Check-out</th>
+                  <td><input type="checkbox" name="checkout_days[0]" value="1" <?php if ( !$vacancy_data['id'] || $vacancy_data['checkout_days'][0] ) echo esc_attr( 'checked' ); ?>></td>
+                  <td><input type="checkbox" name="checkout_days[1]" value="1" <?php if ( !$vacancy_data['id'] || $vacancy_data['checkout_days'][1] ) echo esc_attr( 'checked' ); ?>></td>
+                  <td><input type="checkbox" name="checkout_days[2]" value="1" <?php if ( !$vacancy_data['id'] || $vacancy_data['checkout_days'][2] ) echo esc_attr( 'checked' ); ?>></td>
+                  <td><input type="checkbox" name="checkout_days[3]" value="1" <?php if ( !$vacancy_data['id'] || $vacancy_data['checkout_days'][3] ) echo esc_attr( 'checked' ); ?>></td>
+                  <td><input type="checkbox" name="checkout_days[4]" value="1" <?php if ( !$vacancy_data['id'] || $vacancy_data['checkout_days'][4] ) echo esc_attr( 'checked' ); ?>></td>
+                  <td><input type="checkbox" name="checkout_days[5]" value="1" <?php if ( !$vacancy_data['id'] || $vacancy_data['checkout_days'][5] ) echo esc_attr( 'checked' ); ?>></td>
+                  <td><input type="checkbox" name="checkout_days[6]" value="1" <?php if ( !$vacancy_data['id'] || $vacancy_data['checkout_days'][6] ) echo esc_attr( 'checked' ); ?>></td>
+                  <td>
+                    <a href="#" class="button-primary mt-check-all-row">ALL</a>
+                    <a href="#" class="button-primary mt-uncheck-all-row">NONE</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+
+
+
 					<tr>
 						<th><?php _e('Price Per Room (per night)', 'trav') ?></th>
 						<td><input type="number" name="price_per_room" value="<?php if ( ! empty( $vacancy_data['price_per_room'] ) ) echo esc_attr( $vacancy_data['price_per_room'] ); ?>" step=".01"></td>
@@ -650,9 +711,13 @@ if ( ! function_exists( 'trav_acc_vacancy_save_action' ) ) {
 				'date_to'           => '9999-12-31',
 				'price_per_room'    => 0,
 				'price_per_person'  => 0,
+				'checkin_days'  => "1111111",
+				'checkout_days'  => "1111111",
+        'minimum_stay' => NULL,
+        'maximum_stay' => NULL
 			);
 
-			$table_fields = array( 'date_from', 'date_to', 'accommodation_id', 'room_type_id', 'treatment_id', 'rooms', 'price_per_room', 'price_per_person' );
+			$table_fields = array( 'date_from', 'date_to', 'accommodation_id', 'room_type_id', 'treatment_id', 'rooms', 'price_per_room', 'price_per_person', 'minimum_stay', 'maximum_stay' );
 			$data = array();
 			foreach ( $table_fields as $table_field ) {
 				if ( ! empty( $_POST[ $table_field ] ) ) {
@@ -677,6 +742,28 @@ if ( ! function_exists( 'trav_acc_vacancy_save_action' ) ) {
         });
 				$data['child_price'] = serialize( $child_price_data );
 			}
+
+      $data['checkin_days'] = "";
+      if(!empty($_POST["checkin_days"])){
+        for($i = 0; $i < 7; $i++){
+          if($_POST["checkin_days"][$i]){
+            $data['checkin_days'] .= "1";
+          } else {
+            $data['checkin_days'] .= "0";
+          }
+        }
+      }
+      $data['checkout_days'] = "";
+      if(!empty($_POST["checkout_days"])){
+        for($i = 0; $i < 7; $i++){
+          if($_POST["checkout_days"][$i]){
+            $data['checkout_days'] .= "1";
+          } else {
+            $data['checkout_days'] .= "0";
+          }
+        }
+      }
+
 
 
 			$data = array_replace( $default_vacancy_data, $data );
@@ -730,6 +817,8 @@ if ( ! function_exists( 'trav_acc_vacancy_admin_enqueue_scripts' ) ) {
 		wp_enqueue_style( 'trav_admin_acc_style' , TRAV_TEMPLATE_DIRECTORY_URI . '/inc/admin/css/style.css' );
 		wp_enqueue_script( 'trav_admin_acc_script' , TRAV_TEMPLATE_DIRECTORY_URI . '/inc/admin/accommodation/js/script.js', array('jquery'), '1.0', true );
 		wp_enqueue_script( 'mt_admin_children_script' , MT_TEMPLATE_DIRECTORY_URI . '/inc/admin/accommodation/js/children.js', array('jquery'), '1.0', true );
+    wp_enqueue_style( 'mt_admin_acc_style' , MT_TEMPLATE_DIRECTORY_URI . '/inc/admin/css/style.css' );
+
 	}
 }
 
