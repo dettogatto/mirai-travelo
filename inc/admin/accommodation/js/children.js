@@ -1,6 +1,8 @@
 (function($){
 
-  function hide_remove_buttons(){
+  // Child cost
+
+  function hide_remove_buttons_child(){
     var remove_buttons = $('.mt-child-remove-age');
     remove_buttons.each(function(){
 
@@ -44,7 +46,7 @@
       $(this).attr( 'name', name );
     });
 
-    hide_remove_buttons();
+    hide_remove_buttons_child();
 
   });
 
@@ -62,7 +64,7 @@
       single_child_cost.remove();
     }
 
-    hide_remove_buttons();
+    hide_remove_buttons_child();
 
   });
 
@@ -105,14 +107,99 @@
       $(this).attr( 'name', name );
     });
 
-    hide_remove_buttons();
+    hide_remove_buttons_child();
 
   });
 
-  $(document).ready(hide_remove_buttons);
+  $(document).ready(hide_remove_buttons_child);
 
 
 
+
+
+
+
+
+
+
+
+
+  // Advanced Cost
+
+  function assignAdultsNumbers(){
+    var i = 1;
+    $('.single-advanced-cost').each(function(){
+      $(this).find('.n_of_adult').html(i);
+      i++;
+    });
+  }
+
+  // Add single advanced
+  $('body').on('click', '.mt-add-advanced-cost', function(e){
+
+    e.preventDefault();
+
+    var last_clone = $('.single-advanced-cost:last');
+    var new_clone = last_clone.clone();
+    new_clone.insertAfter( last_clone );
+    assignAdultsNumbers();
+
+  });
+
+
+  // Remove advanced cost triplet
+  $('body').on('click', '.mt-advanced-price-remove-adult', function(e){
+    e.preventDefault();
+
+    var single_advanced_cost = $(this).closest('.single-advanced-cost');
+    single_advanced_cost.remove();
+    assignAdultsNumbers();
+
+  });
+
+
+  $('body').on('click', '.mt-advanced-percentage-price', function(e){
+    e.preventDefault();
+
+    var percent = parseFloat( prompt("Insert percentage of Adult #1 price", "50"));
+    var full_price = parseFloat( $('input[name="price_per_person"]').val() );
+    var advanced_price = full_price * percent / 100;
+    $(this).closest('.single-advanced-cost').find('input:last').val(advanced_price);
+  });
+
+  // Change price_per_person accordingly
+
+  $('body').on('input', '.single-advanced-cost:first input', function(e){
+    $('input[name="price_per_person"]').val( $(this).val() );
+  });
+
+  // And vice versa
+  $('body').on('input', 'input[name="price_per_person"]', function(e){
+    $('.single-advanced-cost:first input').val( $(this).val() );
+  });
+
+  // Hide/show advanced cost
+  function hideShowAdvancedCost(){
+    if($('#advanced_cost_yn').prop("checked")){
+      var first_input = $('.single-advanced-cost:first input');
+      if(true || !first_input.val()){
+        first_input.val($('input[name="price_per_person"]').val());
+      }
+      $('.advanced-cost').show();
+      $('#price_per_person_container').hide();
+    } else {
+      $('.advanced-cost').hide();
+      $('#price_per_person_container').show();
+    }
+  }
+
+  $('body').on('change', '#advanced_cost_yn', hideShowAdvancedCost);
+  $(document).ready(hideShowAdvancedCost);
+
+
+
+
+  // Weekdays
 
   $('.mt-check-all-row').click(function(){
     $(this).closest('tr').find('input[type="checkbox"]').prop("checked", true);

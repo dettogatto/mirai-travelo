@@ -427,7 +427,7 @@ if ( ! function_exists( 'trav_acc_vacancy_render_manage_page' ) ) {
 					</tr>
 
 					<tr>
-						<th><?php _e('Treatment', 'miraitravelo') ?></th>
+						<th><?php _e('Treatment', 'trav') ?></th>
 						<td>
 							<select name="treatment_id" id="treatment_id" style="width: 250px">
 								<option></option>
@@ -531,11 +531,103 @@ if ( ! function_exists( 'trav_acc_vacancy_render_manage_page' ) ) {
 						<th><?php _e('Price Per Room (per night)', 'trav') ?></th>
 						<td><input type="number" name="price_per_room" value="<?php if ( ! empty( $vacancy_data['price_per_room'] ) ) echo esc_attr( $vacancy_data['price_per_room'] ); ?>" step=".01"></td>
 					</tr>
-					<tr>
-						<th><?php _e('Price Per Person (per night)', 'trav') ?></th>
-						<td><input type="number" name="price_per_person" value="<?php if ( ! empty( $vacancy_data['price_per_person'] ) ) echo esc_attr( $vacancy_data['price_per_person'] ); ?>" step=".01"></td>
-					</tr>
-					<tr>
+
+          <tr class="mirai-admin-padding">
+            <th><?php _e('Advanced price', 'trav') ?></th>
+            <td>
+              <label for="advanced_cost_yn">
+                <input type="checkbox" id="advanced_cost_yn" name="advanced_cost_yn" value="y" <?php if ( ! empty( $vacancy_data['advanced_price'] ) ) echo esc_attr( 'checked' ); ?>>
+                <?php _e('Choose individual prices for the adults', 'trav') ?>
+              </label>
+            </td>
+          </tr>
+
+          <tr id="price_per_person_container">
+            <th><?php _e('Price Per Person (per night)', 'trav') ?></th>
+            <td><input type="number" name="price_per_person" value="<?php if ( ! empty( $vacancy_data['price_per_person'] ) ) echo esc_attr( $vacancy_data['price_per_person'] ); ?>" step=".01"></td>
+          </tr>
+
+
+
+
+
+          <?php
+
+          // $advanced_price = array(
+          //   array(
+          //     [50], // price of adult #1
+          //     [50], // price of adult #2
+          //     [25], // price of adult #3
+          //   )
+          // );
+
+          $advanced_price = array();
+          if ( ! empty( $vacancy_data['advanced_price'] ) ) {
+            $advanced_price = unserialize( $vacancy_data['advanced_price'] );
+          }
+
+
+
+          if ( empty( $advanced_price ) ) {
+            $advanced_price = array(
+              array(
+                [""]
+              )
+            );
+          }
+
+            $i = 0;
+
+            foreach ($advanced_price as $current_advanced_price) {
+
+              ?>
+
+              <tr class="advanced-cost single-advanced-cost">
+    						<th><?php _e('Price for Adult', 'trav') ?> #<span class="n_of_adult"><?php echo($i+1); ?></span> (per night)</th>
+    						<td>
+                  <input type="number" name="advanced_price[]" value="<?php echo($current_advanced_price); ?>" step=".01">
+                  <a href="#" class="button-primary mt-advanced-percentage-price">%</a>
+                  <a href="#" class="button-secondary mt-advanced-price-remove-adult">-</a>
+                </td>
+    					</tr>
+
+              <?php
+
+
+              $i++;
+
+            }
+
+          ?>
+
+          <tr class="advanced-cost mirai-admin-padding">
+            <th></th>
+            <td>
+              <a href="#" class="button-primary mt-add-advanced-cost">Add adult</a>
+            </td>
+            <td>
+              <span>The price of further adults will be the same as the last price specified</span>
+            </td>
+          </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+					<tr class="mirai-admin-padding">
 						<th><?php _e('Charge for Children?', 'trav') ?></th>
 						<td>
 							<label for="child_cost_yn">
@@ -551,7 +643,7 @@ if ( ! function_exists( 'trav_acc_vacancy_render_manage_page' ) ) {
 
           // $child_price = array(
           //   array(
-          //     [1, 3, 50],
+          //     [1, 3, 50], // [min-age, max-age, price]
           //     [4, 7, 100],
           //     [8, 10, 110],
           //   ),
@@ -584,11 +676,12 @@ if ( ! function_exists( 'trav_acc_vacancy_render_manage_page' ) ) {
               ?>
 
               <tr class="child_cost single_child_cost">
-                <th>
+                <th style="padding-top: 0px;">
                   <?php _e('Price of Children', 'trav') ?> #<span class="n_of_child"><?php echo($i+1); ?></span>
+                  <br>
+                  (per night)
                 </th>
                 <td colspan="2">
-                  <br><br>
                   <table>
                     <tr>
                       <th>min age</th>
@@ -620,8 +713,9 @@ if ( ! function_exists( 'trav_acc_vacancy_render_manage_page' ) ) {
                     }
                     ?>
                   </table>
-                  <br>
-                  <a href="#" class="button-primary mt-child-add-age">Add age</a>
+                  <div class="mirai-admin-padding">
+                    <a href="#" class="button-primary mt-child-add-age">Add age</a>
+                  </div>
                 </td>
               </tr>
 
@@ -638,9 +732,8 @@ if ( ! function_exists( 'trav_acc_vacancy_render_manage_page' ) ) {
 
 
         </table>
-        <div class="child_cost" style="display:none;">
+        <div class="child_cost mirai-admin-padding" style="display:none;">
           <a href="#" class="button-primary mt-child-add-child">Add child</a>
-          <br><br><br>
         </div>
 				<input type="submit" class="button-primary" name="save" value="<?php _e('Save Vacancy', 'trav') ?>">
 				<a href="edit.php?post_type=accommodation&amp;page=vacancies" class="button-secondary"><?php _e('Cancel', 'trav') ?></a>
@@ -714,7 +807,9 @@ if ( ! function_exists( 'trav_acc_vacancy_save_action' ) ) {
 				'checkin_days'  => "1111111",
 				'checkout_days'  => "1111111",
         'minimum_stay' => NULL,
-        'maximum_stay' => NULL
+        'maximum_stay' => NULL,
+        'child_price' => NULL,
+        'advanced_price' => NULL
 			);
 
 			$table_fields = array( 'date_from', 'date_to', 'accommodation_id', 'room_type_id', 'treatment_id', 'rooms', 'price_per_room', 'price_per_person', 'minimum_stay', 'maximum_stay' );
@@ -725,7 +820,6 @@ if ( ! function_exists( 'trav_acc_vacancy_save_action' ) ) {
 				}
 			}
 
-			$data['child_price'] = '';
 
 			if ( ! empty( $_POST['child_cost_yn'] ) ) {
         $child_price_data = $_POST['child_price'];
@@ -740,7 +834,25 @@ if ( ! function_exists( 'trav_acc_vacancy_save_action' ) ) {
         $child_price_data = array_filter($child_price_data, function($v){
           return !empty($v);
         });
-				$data['child_price'] = serialize( $child_price_data );
+
+        if(empty($child_price_data)){
+          $data['child_price'] = NULL;
+        } else {
+          $data['child_price'] = serialize( $child_price_data );
+        }
+			}
+
+			if ( ! empty( $_POST['advanced_cost_yn'] ) ) {
+        $advanced_price_data = $_POST['advanced_price'];
+        $advanced_price_data = array_filter($advanced_price_data, function($v){
+          return !empty($v);
+        });
+        if(empty($advanced_price_data)){
+          $data['advanced_price'] = NULL;
+        } else {
+          $data['price_per_person'] = $advanced_price_data[0];
+          $data['advanced_price'] = serialize( $advanced_price_data );
+        }
 			}
 
       $data['checkin_days'] = "";

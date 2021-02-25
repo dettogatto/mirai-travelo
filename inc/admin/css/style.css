@@ -2,10 +2,45 @@
   width: 1rem;
 }
 
+.trav_admin_table > tbody > tr > th{
+  width: 200px;
+  padding: 9px;
+}
+
 .admin-weekdays-table th{
   padding-left: 20px;
 }
 
 .admin-weekdays-table{
   margin: 25px 0px 25px -20px;
+}
+
+.advanced-cost{
+  display: none;
+}
+
+.single-advanced-cost ~ .single-advanced-cost input[type="number"]{
+  width: 181px;
+}
+
+
+.single-advanced-cost .mt-advanced-percentage-price,
+.single-advanced-cost .mt-advanced-price-remove-adult {
+  display: none;
+}
+
+.single-advanced-cost ~ .single-advanced-cost .mt-advanced-percentage-price,
+.single-advanced-cost ~ .single-advanced-cost .mt-advanced-price-remove-adult {
+  display: inline-block;
+}
+
+
+.mirai-admin-padding{
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+tr.mirai-admin-padding td, tr.mirai-admin-padding th{
+  padding-top: 20px;
+  padding-bottom: 20px;
 }

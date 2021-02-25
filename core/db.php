@@ -7,6 +7,7 @@ if ( ! function_exists( 'mt_update_db' ) ) {
     $wpdb->query( "ALTER TABLE " . TRAV_ACCOMMODATION_VACANCIES_TABLE . " ADD treatment_id bigint(20) unsigned DEFAULT NULL" );
     $wpdb->query( "ALTER TABLE " . TRAV_ACCOMMODATION_VACANCIES_TABLE . " ADD checkin_days varchar(7) DEFAULT '1111111'" );
     $wpdb->query( "ALTER TABLE " . TRAV_ACCOMMODATION_VACANCIES_TABLE . " ADD checkout_days varchar(7) DEFAULT '1111111'" );
+    $wpdb->query( "ALTER TABLE " . TRAV_ACCOMMODATION_VACANCIES_TABLE . " ADD advanced_price varchar(1000) DEFAULT NULL" );
     $wpdb->query( "ALTER TABLE " . TRAV_ACCOMMODATION_VACANCIES_TABLE . " ADD minimum_stay tinyint(11) DEFAULT NULL" );
     $wpdb->query( "ALTER TABLE " . TRAV_ACCOMMODATION_VACANCIES_TABLE . " ADD maximum_stay tinyint(11) DEFAULT NULL" );
   }
