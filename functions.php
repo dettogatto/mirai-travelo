@@ -23,6 +23,8 @@ define( 'MT_TEMPLATE_DIRECTORY_URI', get_stylesheet_directory_uri() );
 require_once( MT_CORE_FOLDER . '/db.php' );
 require_once( MT_CORE_FOLDER . '/treatment.php' );
 require_once( MT_INC_FOLDER . '/admin/accommodation/vacancies-admin-panel.php' );
+require_once( MT_INC_FOLDER . '/frontend/accommodation/modern.php' );
+require_once( MT_INC_FOLDER . '/frontend/accommodation/functions.php' );
 
 
 // Enqueue child theme accommodation script (overwriting it)

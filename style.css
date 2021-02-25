@@ -5,9 +5,29 @@
  Author:       Nicola
  Author URI:   https://cosmo.cat
  Template:     Travelo
- Version:      0.0.5
+ Version:      0.0.6
  License:      GNU General Public License
  License URI:  http://www.gnu.org/licenses/gpl-2.0.html
  Tags:         child
  Text Domain:  trav
 */
+
+.guest-val:last-child::after{
+  display: none !important;
+}
+
+.btn-book-now-disabled{
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  line-height: 48px;
+  color: #6c7578;
+  border: 1px solid #dce5e8;
+  border-radius: 4px;
+  text-decoration: none;
+  padding: 0 20px;
+}
