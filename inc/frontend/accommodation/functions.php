@@ -28,6 +28,7 @@ if ( ! function_exists( 'trav_acc_get_available_rooms' ) ) {
 		$avg_adults = ceil( $adults / $rooms );
 		$avg_kids = ceil( $kids / $rooms );
 
+
 		// get available accommodation room_type_id based on max_adults and max_kids
 		$sql = "SELECT DISTINCT pm0.post_id AS room_type_id FROM (SELECT * FROM " . $wpdb->postmeta . " WHERE meta_key = 'trav_room_accommodation' AND meta_value = " . esc_sql( $acc_id ) . " ) AS pm0
 				INNER JOIN " . $wpdb->posts . " AS room ON (pm0.post_id = room.ID) AND (room.post_status = 'publish') AND (room.post_type = 'room_type')
@@ -129,9 +130,13 @@ if ( ! function_exists( 'trav_acc_get_available_rooms' ) ) {
 				$child_price = array();
 				$total_child_price = 0;
 
+
+
 				if ( ( $kids > 0 ) && ( ! empty( $child_price_data ) ) && ( ! empty( $child_ages ) ) ) {
 
 					usort($child_price_data, function($a, $b) { return $a[0] - $b[0]; });
+
+
 
 					foreach ( $child_ages as $child_age ) {
 						$is_child = false;
