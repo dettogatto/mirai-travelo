@@ -533,6 +533,18 @@ if ( ! function_exists( 'trav_acc_vacancy_render_manage_page' ) ) {
           </tr>
 
 
+          <tr>
+            <th><?php _e('Minimum guests', 'trav') ?></th>
+            <td><input type="number" name="minimum_guests" value="<?php if ( ! empty( $vacancy_data['minimum_guests'] ) ) echo esc_attr( $vacancy_data['minimum_guests'] ); ?>" step="1"></td>
+            <td><span><?php _e('Total guests. Leave blank to use room\'s default behaviour', 'trav') ?></span></td>
+          </tr>
+          <tr>
+            <th><?php _e('Maximum guests', 'trav') ?></th>
+            <td><input type="number" name="maximum_guests" value="<?php if ( ! empty( $vacancy_data['maximum_guests'] ) ) echo esc_attr( $vacancy_data['maximum_guests'] ); ?>" step="1"></td>
+            <td><span><?php _e('Total guests. Leave blank to use room\'s default behaviour', 'trav') ?></span></td>
+          </tr>
+
+
 
 
 					<tr>
@@ -546,16 +558,6 @@ if ( ! function_exists( 'trav_acc_vacancy_render_manage_page' ) ) {
             </th>
           </tr>
 
-          <tr>
-            <th><?php _e('Minimum adults', 'trav') ?></th>
-            <td><input type="number" name="minimum_adults" value="<?php if ( ! empty( $vacancy_data['minimum_adults'] ) ) echo esc_attr( $vacancy_data['minimum_adults'] ); ?>" step="1"></td>
-            <td><span><?php _e('Leave blank to use room\'s value', 'trav') ?></span></td>
-          </tr>
-          <tr>
-            <th><?php _e('Maximum adults', 'trav') ?></th>
-            <td><input type="number" name="maximum_adults" value="<?php if ( ! empty( $vacancy_data['maximum_adults'] ) ) echo esc_attr( $vacancy_data['maximum_adults'] ); ?>" step="1"></td>
-            <td><span><?php _e('Leave blank to use room\'s value', 'trav') ?></span></td>
-          </tr>
 
           <tr class="mirai-admin-padding">
             <th><?php _e('Advanced price', 'trav') ?></th>
@@ -659,12 +661,12 @@ if ( ! function_exists( 'trav_acc_vacancy_render_manage_page' ) ) {
           <tr>
             <th><?php _e('Minimum kids', 'trav') ?></th>
             <td><input type="number" name="minimum_kids" value="<?php if ( ! empty( $vacancy_data['minimum_kids'] ) ) echo esc_attr( $vacancy_data['minimum_kids'] ); ?>" step="1"></td>
-            <td><span><?php _e('Leave blank to use room\'s value', 'trav') ?></span></td>
+            <td><span><?php _e('Leave blank to use room\'s default behaviour', 'trav') ?></span></td>
           </tr>
           <tr>
             <th><?php _e('Maximum kids', 'trav') ?></th>
             <td><input type="number" name="maximum_kids" value="<?php if ( ! empty( $vacancy_data['maximum_kids'] ) ) echo esc_attr( $vacancy_data['maximum_kids'] ); ?>" step="1"></td>
-            <td><span><?php _e('Leave blank to use room\'s value', 'trav') ?></span></td>
+            <td><span><?php _e('Leave blank to use room\'s default behaviour', 'trav') ?></span></td>
           </tr>
 
 					<tr class="mirai-admin-padding">
@@ -854,13 +856,13 @@ if ( ! function_exists( 'trav_acc_vacancy_save_action' ) ) {
         'maximum_stay' => NULL,
         'child_price' => NULL,
         'advanced_price' => NULL,
-        'minimum_adults' => NULL,
-        'maximum_adults' => NULL,
+        'minimum_guests' => NULL,
+        'maximum_guests' => NULL,
         'minimum_kids' => NULL,
         'maximum_kids' => NULL
 			);
 
-			$table_fields = array( 'date_from', 'date_to', 'accommodation_id', 'room_type_id', 'treatment_id', 'rooms', 'price_per_room', 'price_per_person', 'minimum_stay', 'maximum_stay', 'minimum_adults', 'maximum_adults', 'minimum_kids', 'maximum_kids' );
+			$table_fields = array( 'date_from', 'date_to', 'accommodation_id', 'room_type_id', 'treatment_id', 'rooms', 'price_per_room', 'price_per_person', 'minimum_stay', 'maximum_stay', 'minimum_guests', 'maximum_guests', 'minimum_kids', 'maximum_kids' );
 			$data = array();
 			foreach ( $table_fields as $table_field ) {
 				if ( ! empty( $_POST[ $table_field ] ) ) {
