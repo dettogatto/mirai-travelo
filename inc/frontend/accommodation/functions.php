@@ -81,10 +81,17 @@ if ( ! function_exists( 'trav_acc_get_available_rooms' ) ) {
 			$check_date = esc_sql( $dt->format( "Y-m-d" ) );
 			$check_dates[] = $check_date;
 
+      // MT: Look for vacancies that fit maximum_guests minimum_guests maximum_kids and minimum_kids
+      $minmax_guests_sql = '';
+      $minmax_guests_sql .= ' AND (minimum_guests IS NULL OR minimum_guests <= ' . esc_sql( $avg_adults + $avg_kids ) . ' )';
+      $minmax_guests_sql .= ' AND (maximum_guests IS NULL OR maximum_guests >= ' . esc_sql( $avg_adults + $avg_kids ) . ' )';
+      $minmax_guests_sql .= ' AND (minimum_kids IS NULL OR minimum_kids <= ' . esc_sql( $avg_kids ) . ' )';
+      $minmax_guests_sql .= ' AND (maximum_kids IS NULL OR maximum_kids >= ' . esc_sql( $avg_kids ) . ' )';
+
 			$sql = "SELECT vacancies.room_type_id, vacancies.price_per_room , vacancies.price_per_person, vacancies.child_price, vacancies.checkin_days, vacancies.checkout_days, vacancies.minimum_stay, vacancies.maximum_stay
 					FROM (SELECT room_type_id, rooms, price_per_room, price_per_person, child_price, checkin_days, checkout_days, minimum_stay, maximum_stay
 							FROM " . TRAV_ACCOMMODATION_VACANCIES_TABLE . "
-							WHERE 1=1 AND accommodation_id='" . $acc_id . "' AND room_type_id IN (" . implode( ',', $bookable_room_ids ) . ") AND date_from <= '" . $check_date . "'  AND date_to > '" . $check_date . "' ) AS vacancies
+							WHERE 1=1 AND accommodation_id='" . $acc_id . "' AND room_type_id IN (" . implode( ',', $bookable_room_ids ) . ") AND date_from <= '" . $check_date . "'  AND date_to >= '" . $check_date . "' ".$minmax_guests_sql." ) AS vacancies
 					LEFT JOIN (SELECT room_type_id, SUM(rooms) AS rooms
 							FROM " . TRAV_ACCOMMODATION_BOOKINGS_TABLE . "
 							WHERE 1=1 AND status!='0' AND accommodation_id='" . $acc_id . "' AND date_to > '" . $check_date . "'  AND date_from <= '" . $check_date . "'" . ( ( empty( $except_booking_no ) || empty( $pin_code ) )?"":( " AND NOT ( booking_no = '" . $except_booking_no . "' AND pin_code = '" . $pin_code . "' )" ) ) . " GROUP BY room_type_id
