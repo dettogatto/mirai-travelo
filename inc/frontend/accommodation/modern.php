@@ -65,7 +65,6 @@ if ( ! function_exists( 'trav_modern_acc_get_room_detail_html' ) ) {
             <?php endif; ?>
           </div>
 					<p class="description"><?php echo implode( ', ', $facility_names ); ?></p>
-
 					<div class="info-bottom-part">
             <div class="price-field"><?php echo trav_get_price_field( $room_price ); ?> <span>/ <?php echo esc_html( $number_of_days ); ?> <?php echo esc_html( _n( 'Night', 'Nights', $number_of_days, 'trav' ) ); ?></span></div>
             <?php if($info['valid']) : ?>
@@ -162,11 +161,17 @@ if ( ! function_exists( 'trav_modern_ajax_acc_get_available_rooms' ) ) {
 						<?php
 						foreach ( $available_room_type_ids as $room_type_id ) {
 							$room_price = 0;
+              $info = $return_value["additional_info"][$room_type_id];
+              $info["prices"] = NULL;
+
+
 							foreach ( $return_value['check_dates'] as $check_date ) {
 								$room_price += (float) $return_value['prices'][ $room_type_id ][ $check_date ]['total'];
+                $info["prices"] = $return_value['prices'][ $room_type_id ][ $check_date ];
 							}
 
-							trav_modern_acc_get_room_detail_html( $room_type_id, 'available', $room_price, $number_of_days, $rooms, $return_value["additional_info"][$room_type_id] );
+
+							trav_modern_acc_get_room_detail_html( $room_type_id, 'available', $room_price, $number_of_days, $rooms, $info );
 						}
 						?>
 					</div>

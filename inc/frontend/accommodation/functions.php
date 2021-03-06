@@ -1,10 +1,10 @@
 <?php
 
 /*
- * Return matched accs to given data. It is used for check availability function
+ * Return matched accs to given data. It is used for check availability function & price calculation
  */
 if ( ! function_exists( 'trav_acc_get_available_rooms' ) ) {
-	function trav_acc_get_available_rooms( $acc_id, $from_date, $to_date, $rooms=1, $adults=1, $kids, $child_ages, $except_booking_no=0, $pin_code=0 ) {
+	function trav_acc_get_available_rooms( $acc_id, $from_date, $to_date, $rooms=1, $adults=1, $kids, $child_ages, $except_booking_no=0, $pin_code=0, $room_type_id=NULL) {
 
 		// validation
 		$acc_id = trav_acc_org_id( $acc_id );
@@ -36,7 +36,8 @@ if ( ! function_exists( 'trav_acc_get_available_rooms' ) ) {
 				LEFT JOIN " . $wpdb->postmeta . " AS pm2 ON (pm0.post_id = pm2.post_id) AND (pm2.meta_key = 'trav_room_max_kids')
 				WHERE ( pm1.meta_value >= " . esc_sql( $avg_adults ) . " ) AND ( pm1.meta_value + IFNULL(pm2.meta_value,0) >= " . esc_sql( $avg_adults + $avg_kids ) . " )";
 
-		$matched_room_ids = $wpdb->get_col( $sql ); //object (room_type_id)
+    // If room_type_id is provided use that one, else search them up
+		$matched_room_ids = $room_type_id ? [$room_type_id] : $wpdb->get_col( $sql ); //object (room_type_id)
 
 		if ( empty( $matched_room_ids ) ){
 			$return_value = array(
@@ -88,8 +89,8 @@ if ( ! function_exists( 'trav_acc_get_available_rooms' ) ) {
       $minmax_guests_sql .= ' AND (minimum_kids IS NULL OR minimum_kids <= ' . esc_sql( $avg_kids ) . ' )';
       $minmax_guests_sql .= ' AND (maximum_kids IS NULL OR maximum_kids >= ' . esc_sql( $avg_kids ) . ' )';
 
-			$sql = "SELECT vacancies.room_type_id, vacancies.price_per_room , vacancies.price_per_person, vacancies.child_price, vacancies.checkin_days, vacancies.checkout_days, vacancies.minimum_stay, vacancies.maximum_stay
-					FROM (SELECT room_type_id, rooms, price_per_room, price_per_person, child_price, checkin_days, checkout_days, minimum_stay, maximum_stay
+			$sql = "SELECT vacancies.room_type_id, vacancies.price_per_room , vacancies.price_per_person, vacancies.child_price, vacancies.checkin_days, vacancies.checkout_days, vacancies.minimum_stay, vacancies.maximum_stay, vacancies.advanced_price
+					FROM (SELECT room_type_id, rooms, price_per_room, price_per_person, child_price, checkin_days, checkout_days, minimum_stay, maximum_stay, advanced_price
 							FROM " . TRAV_ACCOMMODATION_VACANCIES_TABLE . "
 							WHERE 1=1 AND accommodation_id='" . $acc_id . "' AND room_type_id IN (" . implode( ',', $bookable_room_ids ) . ") AND date_from <= '" . $check_date . "'  AND date_to >= '" . $check_date . "' ".$minmax_guests_sql." ) AS vacancies
 					LEFT JOIN (SELECT room_type_id, SUM(rooms) AS rooms
@@ -118,6 +119,7 @@ if ( ! function_exists( 'trav_acc_get_available_rooms' ) ) {
 				$price_per_room = (float) $result->price_per_room;
 				$price_per_person = (float) $result->price_per_person;
 				$child_price_data = unserialize( $result->child_price );
+				$advanced_price_data = unserialize( $result->advanced_price );
 				$checkin_days_bits = strlen($result->checkin_days) === 7 ? $result->checkin_days : "1111111";
 				$checkout_days_bits = strlen($result->checkout_days) === 7 ? $result->checkout_days : "1111111";
 				$minimum_stay = (int) $result->minimum_stay;
@@ -141,33 +143,92 @@ if ( ! function_exists( 'trav_acc_get_available_rooms' ) ) {
 
 				if ( ( $kids > 0 ) && ( ! empty( $child_price_data ) ) && ( ! empty( $child_ages ) ) ) {
 
-					usort($child_price_data, function($a, $b) { return $a[0] - $b[0]; });
+          // Calculate price for ages in ascending order
+
+          sort($child_ages);
+
+          $total_asc = 0;
+          $detail_asc = array();
+          $i = 0;
+          foreach($child_ages as $child_age){
+            $is_child = false;
+            $cp_data = is_array($child_price_data[$i]) ? $child_price_data[$i] : $child_price_data[count($child_price_data) - 1];
+            foreach ( $cp_data as $age_price_trio ) {
+              if ( is_array( $age_price_trio ) && ( count( $age_price_trio ) >= 3 ) && ( (int) $child_age >= (int) $age_price_trio[0] ) && ( (int) $child_age <= (int) $age_price_trio[1] ) ) {
+                $is_child = true;
+                $detail_asc[] = (float) $age_price_trio[2];
+                $total_asc += (float) $age_price_trio[2];
+                break;
+              }
+            }
+            if( !$is_child ){
+              $detail_asc[] = 1000;
+              $total_asc += 1000;
+            }
+            $i++;
+          }
+
+          // Calculate price for ages in descending order
+
+          rsort($child_ages);
+
+          $total_desc = 0;
+          $detail_desc = array();
+          $i = 0;
+          foreach($child_ages as $child_age){
+            $is_child = false;
+            $cp_data = is_array($child_price_data[$i]) ? $child_price_data[$i] : $child_price_data[count($child_price_data) - 1];
+            foreach ( $cp_data as $age_price_trio ) {
+              if ( is_array( $age_price_trio ) && ( count( $age_price_trio ) >= 3 ) && ( (int) $child_age >= (int) $age_price_trio[0] ) && ( (int) $child_age <= (int) $age_price_trio[1] ) ) {
+                $is_child = true;
+                $detail_desc[] = (float) $age_price_trio[2];
+                $total_desc += (float) $age_price_trio[2];
+                break;
+              }
+            }
+            if( !$is_child ){
+              $detail_desc[] = 1000;
+              $total_desc += 1000;
+            }
+            $i++;
+          }
+
+          // Choose lowest price
+
+          if($total_desc < $total_asc){
+            $child_price = $detail_desc;
+    				$total_child_price = $total_desc;
+          } else {
+            $child_price = $detail_asc;
+    				$total_child_price = $total_asc;
+          }
+
+        }
+
+        // Calculate adults price
+
+        $adults_price = $price_per_person * $adults;
+        $adults_detail = array();
+
+        $advanced_price = $result->advanced_price;
 
 
+        if( !empty($advanced_price_data) ){
+          $adults_price = 0;
+          for($i = 0; $i < $adults; $i++){
+            $ap_data = $advanced_price_data[$i] ? $advanced_price_data[$i] : $advanced_price_data[count($advanced_price_data) - 1];
+            $adults_detail[] = (float) $ap_data;
+            $adults_price += (float) $ap_data;
+          }
+        }
 
-					foreach ( $child_ages as $child_age ) {
-						$is_child = false;
-						foreach ( $child_price_data as $age_price_pair ) {
-							if ( is_array( $age_price_pair ) && ( count( $age_price_pair ) >= 2 ) && ( (int) $child_age <= (int) $age_price_pair[0] ) ) {
-								$is_child = true;
-								$child_price[] = (float) $age_price_pair[1];
-								$total_child_price += (float) $age_price_pair[1];
-								break;
-							}
-						}
+        // Calculate total price
 
-						//if child price for this age is not set, calculate as a adult
-						if ( ! $is_child ) {
-							$child_price[] = $price_per_person;
-							$total_child_price += $price_per_person;
-						}
-					}
-				}
-
-				$total_price = $price_per_room * $rooms + $price_per_person * $adults + $total_child_price;
+				$total_price = $price_per_room * $rooms + $adults_price + $total_child_price;
 				$price_data[ $result->room_type_id ][ $check_date ] = array(
 					'ppr' => $price_per_room,
 					'ppp' => $price_per_person,
+          'ap' => $adults_detail,
 					'cp' => $child_price,
 					'total' => $total_price
 				);
@@ -203,4 +264,48 @@ if ( ! function_exists( 'trav_acc_get_available_rooms' ) ) {
 
 		return $return_value;
 	}
+}
+
+
+/*
+ * Calculate the price of selected accommodation room and return price array data
+ */
+if ( ! function_exists( 'trav_acc_get_room_price_data' ) ) {
+  function trav_acc_get_room_price_data( $acc_id, $room_type_id, $from_date, $to_date, $rooms=1, $adults=1, $kids=0, $child_ages, $except_booking_no=0, $pin_code=0 ) {
+
+    $acc_id = trav_acc_org_id( $acc_id );
+		$room_type_id = trav_room_org_id( $room_type_id );
+
+		//validation
+		if ( ! is_array( $child_ages ) ){ $child_ages = unserialize($child_ages); }
+		$room_accommodation_id = get_post_meta( $room_type_id, 'trav_room_accommodation', true );
+		if ( $room_accommodation_id != $acc_id ) return false;
+    if ( ( time()-( 60*60*24 ) ) > trav_strtotime( $from_date ) ) return false;
+
+    $from_date_obj = new DateTime( '@' . trav_strtotime( $from_date ) );
+		$to_date_obj = new DateTime( '@' . trav_strtotime( $to_date ) );
+    $date_interval = DateInterval::createFromDateString('1 day');
+		$period = new DatePeriod($from_date_obj, $date_interval, $to_date_obj);
+
+    $check_dates = array();
+    $prices = array();
+    $total_price = 0;
+
+    foreach ( $period as $dt ) {
+			$check_date = esc_sql( $dt->format( "Y-m-d" ) );
+      $next_day = esc_sql( $dt->modify('+1 day')->format( "Y-m-d" ) );
+      $check_dates[] = $check_date;
+      $available_room = trav_acc_get_available_rooms( $acc_id, $check_date, $next_day, $rooms, $adults, $kids, $child_ages, $except_booking_no, $pin_code, $room_type_id);
+      $prices[$check_date] = $available_room["prices"][$room_type_id][$check_date];
+      $total_price += $prices[$check_date]['total'];
+    }
+
+    $return_value = array(
+			'check_dates' => $check_dates,
+			'prices'      => $prices,
+			'total_price' => $total_price
+		);
+
+		return $return_value;
+  }
 }
