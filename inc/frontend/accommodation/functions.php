@@ -1,8 +1,63 @@
 <?php
 
 /*
+ * Calculate price for children
+ */
+
+if( ! function_exists( 'mt_get_children_prices_obj' ) ){
+  function mt_get_children_prices_obj($child_ages, $child_price_data){
+
+    $total = 0;
+    $detail = array();
+    $i = 0;
+    $adults = 0;
+    $infants = 0;
+
+    foreach($child_ages as $child_age){
+      $is_child = false;
+      $children_max_age = 99;
+      $cp_data = is_array($child_price_data[$i]) ? $child_price_data[$i] : $child_price_data[count($child_price_data) - 1];
+      foreach ( $cp_data as $age_price_trio ) {
+        if ( is_array( $age_price_trio ) && ( count( $age_price_trio ) >= 3 ) && ( (int) $child_age >= (int) $age_price_trio[0] ) && ( (int) $child_age <= (int) $age_price_trio[1] ) ) {
+          $is_child = true;
+          $detail[] = (float) $age_price_trio[2];
+          $total += (float) $age_price_trio[2];
+          $i++;
+          break;
+        } elseif(count( $age_price_trio ) >= 3){
+          $children_max_age = $age_price_trio[1];
+        }
+      }
+      if( !$is_child ){
+        if($child_age > $children_max_age){
+          // Consider as adult
+          $adults ++;
+        } else {
+          // Consider as infant
+          $detail[] = 0;
+          $total += 0;
+        }
+      }
+    }
+
+    $return_obj = [
+      "total" => $total,
+      "detail" => $detail,
+      "adults" => $adults,
+      "infants" => $infants
+    ];
+
+    return $return_obj;
+
+  }
+}
+
+
+
+/*
  * Return matched accs to given data. It is used for check availability function & price calculation
  */
+
 if ( ! function_exists( 'trav_acc_get_available_rooms' ) ) {
 	function trav_acc_get_available_rooms( $acc_id, $from_date, $to_date, $rooms=1, $adults=1, $kids, $child_ages, $except_booking_no=0, $pin_code=0, $room_type_id=NULL) {
 
@@ -133,79 +188,41 @@ if ( ! function_exists( 'trav_acc_get_available_rooms' ) ) {
           $vacancy_room_info[$result->room_type_id]["checkout_days"] = $checkout_days_bits;
         }
 
+        // calculate children price
 
-
-        // TODO calculate child price
 				$child_price = array();
 				$total_child_price = 0;
 
-
-
 				if ( ( $kids > 0 ) && ( ! empty( $child_price_data ) ) && ( ! empty( $child_ages ) ) ) {
 
-          // Calculate price for ages in ascending order
+          // Calculate child price for ages in ascending order
 
           sort($child_ages);
+          $cp_asc = mt_get_children_prices_obj($child_ages, $child_price_data);
 
-          $total_asc = 0;
-          $detail_asc = array();
-          $i = 0;
-          foreach($child_ages as $child_age){
-            $is_child = false;
-            $cp_data = is_array($child_price_data[$i]) ? $child_price_data[$i] : $child_price_data[count($child_price_data) - 1];
-            foreach ( $cp_data as $age_price_trio ) {
-              if ( is_array( $age_price_trio ) && ( count( $age_price_trio ) >= 3 ) && ( (int) $child_age >= (int) $age_price_trio[0] ) && ( (int) $child_age <= (int) $age_price_trio[1] ) ) {
-                $is_child = true;
-                $detail_asc[] = (float) $age_price_trio[2];
-                $total_asc += (float) $age_price_trio[2];
-                break;
-              }
-            }
-            if( !$is_child ){
-              $detail_asc[] = 1000;
-              $total_asc += 1000;
-            }
-            $i++;
-          }
-
-          // Calculate price for ages in descending order
+          // Calculate child price for ages in descending order
 
           rsort($child_ages);
+          $cp_desc = mt_get_children_prices_obj($child_ages, $child_price_data);
 
-          $total_desc = 0;
-          $detail_desc = array();
-          $i = 0;
-          foreach($child_ages as $child_age){
-            $is_child = false;
-            $cp_data = is_array($child_price_data[$i]) ? $child_price_data[$i] : $child_price_data[count($child_price_data) - 1];
-            foreach ( $cp_data as $age_price_trio ) {
-              if ( is_array( $age_price_trio ) && ( count( $age_price_trio ) >= 3 ) && ( (int) $child_age >= (int) $age_price_trio[0] ) && ( (int) $child_age <= (int) $age_price_trio[1] ) ) {
-                $is_child = true;
-                $detail_desc[] = (float) $age_price_trio[2];
-                $total_desc += (float) $age_price_trio[2];
-                break;
-              }
-            }
-            if( !$is_child ){
-              $detail_desc[] = 1000;
-              $total_desc += 1000;
-            }
-            $i++;
-          }
+          // Choose lowest children price
 
-          // Choose lowest price
+          $cp;
 
-          if($total_desc < $total_asc){
-            $child_price = $detail_desc;
-    				$total_child_price = $total_desc;
+          if($cp_desc["adults"] < $cp_asc["adults"] || $cp_desc["total"] < $cp_asc["total"]){
+            $cp = $cp_desc;
           } else {
-            $child_price = $detail_asc;
-    				$total_child_price = $total_asc;
+            $cp = $cp_asc;
           }
+
+          $child_price = $cp["detail"];
+          $total_child_price = $cp["total"];
 
         }
 
         // Calculate adults price
+
+        $adults += $cp["adults"]; // Add childs with age too high
 
         $adults_price = $price_per_person * $adults;
         $adults_detail = array();
@@ -270,6 +287,7 @@ if ( ! function_exists( 'trav_acc_get_available_rooms' ) ) {
 /*
  * Calculate the price of selected accommodation room and return price array data
  */
+
 if ( ! function_exists( 'trav_acc_get_room_price_data' ) ) {
   function trav_acc_get_room_price_data( $acc_id, $room_type_id, $from_date, $to_date, $rooms=1, $adults=1, $kids=0, $child_ages, $except_booking_no=0, $pin_code=0 ) {
 

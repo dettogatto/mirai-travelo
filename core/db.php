@@ -12,8 +12,6 @@ if ( ! function_exists( 'mt_update_db' ) ) {
     $wpdb->query( "ALTER TABLE " . TRAV_ACCOMMODATION_VACANCIES_TABLE . " ADD maximum_stay tinyint(11) DEFAULT NULL" );
     $wpdb->query( "ALTER TABLE " . TRAV_ACCOMMODATION_VACANCIES_TABLE . " ADD minimum_guests tinyint(11) DEFAULT NULL" );
     $wpdb->query( "ALTER TABLE " . TRAV_ACCOMMODATION_VACANCIES_TABLE . " ADD maximum_guests tinyint(11) DEFAULT NULL" );
-    $wpdb->query( "ALTER TABLE " . TRAV_ACCOMMODATION_VACANCIES_TABLE . " DROP COLUMN minimum_adults" );
-    $wpdb->query( "ALTER TABLE " . TRAV_ACCOMMODATION_VACANCIES_TABLE . " DROP COLUMN maximum_adults" );
     $wpdb->query( "ALTER TABLE " . TRAV_ACCOMMODATION_VACANCIES_TABLE . " ADD minimum_kids tinyint(11) DEFAULT NULL" );
     $wpdb->query( "ALTER TABLE " . TRAV_ACCOMMODATION_VACANCIES_TABLE . " ADD maximum_kids tinyint(11) DEFAULT NULL" );
   }
