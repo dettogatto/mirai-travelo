@@ -5,7 +5,7 @@
  Author:       Nicola
  Author URI:   https://cosmo.cat
  Template:     Travelo
- Version:      0.0.11
+ Version:      0.0.12
  License:      GNU General Public License
  License URI:  http://www.gnu.org/licenses/gpl-2.0.html
  Tags:         child
@@ -30,4 +30,20 @@
   border-radius: 4px;
   text-decoration: none;
   padding: 0 20px;
+}
+
+.child-age-small-container{
+  border-top: 1px solid #dce5e8;
+  padding-top: 15px;
+}
+
+.child-ages-box{
+    justify-content: center !important;
+    flex-wrap: wrap;
+    padding-top: 5px;
+}
+
+.child-ages-box .single-child-age{
+  padding: 5px !important;
+  padding-bottom: 5px;
 }

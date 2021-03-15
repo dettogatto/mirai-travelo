@@ -113,6 +113,7 @@ if ( ! function_exists( 'trav_modern_ajax_acc_get_available_rooms' ) ) {
 		$kids = ( isset( $_POST['kids'] ) && is_numeric( $_POST['kids'] ) ) ? sanitize_text_field( $_POST['kids'] ) : 0;
 		$child_ages = isset( $_POST['child_ages'] ) ? $_POST['child_ages'] : '';
 
+
 		if ( isset( $_POST['accommodation_id'] ) && isset( $_POST['date_from'] ) && trav_strtotime( $_POST['date_from'] ) && isset( $_POST['date_to'] ) && trav_strtotime( $_POST['date_to'] ) && ( ( time()-(60*60*24) ) < trav_strtotime( $_POST['date_from'] ) ) ) {
 			$acc_id = (int) $_POST['accommodation_id'];
 			$except_booking_no = 0;

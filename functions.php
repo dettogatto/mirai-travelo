@@ -26,9 +26,15 @@ require_once( MT_INC_FOLDER . '/admin/accommodation/vacancies-admin-panel.php' )
 require_once( MT_INC_FOLDER . '/frontend/accommodation/modern.php' );
 require_once( MT_INC_FOLDER . '/frontend/accommodation/functions.php' );
 
+// shortcodes
+require_once( MT_CORE_FOLDER . '/shortcodes/mt-search-form.php' );
+
 
 // Enqueue child theme accommodation script (overwriting it)
 add_action( 'wp_enqueue_scripts', function(){
-  wp_enqueue_script( 'trav_script_accommodation', MT_TEMPLATE_DIRECTORY_URI . '/js/modern/accommodation.js', array( 'jquery' ), '', true );
+  wp_register_script( 'trav_script_main_script', MT_TEMPLATE_DIRECTORY_URI . '/js/modern/scripts.js', array( 'jquery' ), '', true );
+  wp_register_script( 'trav_script_accommodation', MT_TEMPLATE_DIRECTORY_URI . '/js/modern/accommodation.js', array( 'jquery', 'trav_script_main_script' ), '', true );
+  wp_enqueue_script( 'trav_script_main_script' );
+  wp_enqueue_script( 'trav_script_accommodation');
   wp_localize_script( 'trav_script_accommodation', 'date_format', trav_get_date_format('js') );
 });

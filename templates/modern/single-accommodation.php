@@ -289,10 +289,30 @@ if ( have_posts() ) {
 															<i class="fas fa-plus"></i>
 														</div>
 													</div>
-													<input type="hidden" name="child_ages[]" value="2">
 												</div>
 
-											</div>
+                      </div>
+
+                      <div class="guest-counter-box child-ages-box child-age-inputs-container">
+
+                        <div class="children-counter counter-box single-child-age">
+													<div class="counter-box-inner">
+														<h4 class="counter-title"><?php echo esc_html__( 'Child age', 'trav' ); ?></h4>
+														<p class="counter-description"><?php echo esc_html__( 'Age of child', 'trav' ); ?> #<span class="child-input-number">1</span></p>
+
+														<div class="count-wrap">
+															<i class="fas fa-minus"></i>
+															<input type="text" name="child_ages[]" class="count-value" min="2" value="2">
+															<i class="fas fa-plus"></i>
+														</div>
+													</div>
+												</div>
+
+
+                      </div>
+
+
+
 										</div>
 
 										<div class="form-submit">
@@ -532,6 +552,23 @@ if ( have_posts() ) {
 															<i class="fas fa-plus"></i>
 														</div>
 													</div>
+
+                          <div class="child-age-inputs-container child-age-small-container">
+
+                            <div class="single-child-age qty-field">
+  														<div class="label-wrap">
+  															<span class="title"><?php echo esc_html__( 'Child age', 'trav' ); ?></span>
+  															<span class="desc"><?php echo esc_html__( 'Age of child', 'trav' ); ?> #<span class="child-input-number">1</span></span>
+  														</div>
+
+  														<div class="count-wrap">
+  															<i class="fas fa-minus"></i>
+  															<input type="text" name="child_ages[]" class="count-value" min="2" max="17" value="2">
+  															<i class="fas fa-plus"></i>
+  														</div>
+  													</div>
+
+                          </div>
 
 												</div>
 

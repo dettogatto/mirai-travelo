@@ -143,24 +143,6 @@ jQuery(document).ready(function($) {
         return false;
     });
 
-	$("#vacant-main-form").submit(function(e) {
-		$(this).find('input').each(function(index) {
-			var inputName = $(this).attr('name');
-			$("#check_availability_form").find('input[name="'+inputName+'"]').val($(this).val());
-		});
-
-		if ( $("#check_availability_form").find('input[name="date_from"]').val() != "" && $("#check_availability_form").find('input[name="date_to"]').val() != "" ) {
-			$("#check_availability_form").find('#single-availability-dates').data('daterangepicker').setStartDate( $("#check_availability_form").find('input[name="date_from"]').val() );
-			$("#check_availability_form").find('#single-availability-dates').data('daterangepicker').setEndDate( $("#check_availability_form").find('input[name="date_to"]').val() );
-			$("#check_availability_form").find('#single-availability-dates').val( $("#check_availability_form").find('input[name="date_from"]').val() + ' - ' + $("#check_availability_form").find('input[name="date_to"]').val() );
-			$("#check_availability_form").find('#single-availability-dates').data('daterangepicker').updateView()
-
-			$("#check_availability_form").submit();
-		}
-
-		return false;
-	});
-
 	//reviews ajax loading
 	$('.more-acc-review').click(function() {
 
@@ -349,4 +331,37 @@ jQuery(document).ready(function($) {
 			scrollTop: $($(this).attr('href')).offset().top - 100
 		}, 'slow');
 	});
+
+  // By Mirai
+
+  $("#vacant-main-form").submit(function(e) {
+    $(this).find('input').each(function(index) {
+      var inputName = $(this).attr('name');
+      $("#check_availability_form").find('input[name="'+inputName+'"]').val($(this).val());
+      if(inputName == "kids"){
+        mt_show_child_age_inputs();
+      }
+    });
+
+    var child_ages = $(this).find('.single-child-age').map(function(){
+      return $(this).find("input").val();
+    }).toArray();
+
+
+    $("#check_availability_form").find('input[name="child_ages[]"]').each(function(){
+      $(this).val(child_ages.shift());
+    });
+
+    if ( $("#check_availability_form").find('input[name="date_from"]').val() != "" && $("#check_availability_form").find('input[name="date_to"]').val() != "" ) {
+      $("#check_availability_form").find('#single-availability-dates').data('daterangepicker').setStartDate( $("#check_availability_form").find('input[name="date_from"]').val() );
+      $("#check_availability_form").find('#single-availability-dates').data('daterangepicker').setEndDate( $("#check_availability_form").find('input[name="date_to"]').val() );
+      $("#check_availability_form").find('#single-availability-dates').val( $("#check_availability_form").find('input[name="date_from"]').val() + ' - ' + $("#check_availability_form").find('input[name="date_to"]').val() );
+      $("#check_availability_form").find('#single-availability-dates').data('daterangepicker').updateView()
+
+      $("#check_availability_form").submit();
+    }
+
+    return false;
+  });
+
 });
